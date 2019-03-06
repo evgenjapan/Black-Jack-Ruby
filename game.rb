@@ -1,13 +1,18 @@
+require_relative 'deck'
+require_relative 'interface'
+require_relative 'player'
+require_relative 'dealer'
 class Game
   BET = 10
 
-  def initialize(player, dealer, deck)
-    @player = player
-    @dealer = dealer
-    @deck = deck
+  def initialize(deck)
+    @interface = Interface.new
+    username = @interface.init_user
+    @player = Player.new(username)
+    @dealer = Dealer.new
     @bank = 0
+    @deck = deck
     @deck_counter = 0
-    start_game
   end
 
   def start_game
@@ -26,6 +31,7 @@ class Game
       deal_card(@player)
       deal_card(@dealer)
     end
+    puts @player.hand.cards
   end
 
   def make_bets
@@ -33,41 +39,71 @@ class Game
     @bank += 20
   end
 
-  def dealer_move
-    return next_move if @dealer.hand.score >= 17
-    deal_card(@dealer)
+  def start_game
+    init_game
+    rounds
+    game_ends
   end
 
-  def next_move
-    puts 'Выбор'
-    choise = gets.to_i
-    case choise
-    when 1 then player_pass
-    when 2 then player_add_card
-    when 3 then open_cards
+  def rounds
+    loop do
+      puts 'Текущая ситуация'
+      @player.hand.__str__
+      @interface.round_dialog
+      choise = gets.to_i
+      case choise
+      when 2 then player_add_card
+      when 3 then break
+      end
+      deal_card(@dealer) if @dealer.take_card?
+      puts "Очки дилера #{@dealer.hand.score}"
+      break if !@player.hand.can_take_card? and !@dealer.hand.can_take_card?
     end
   end
 
-  def player_pass
-    dealer_move
+  def init_game
+    make_bets
+    deal_cards
   end
 
   def player_add_card
-    deal_card(@player)
+    if !@player.hand.can_take_card?
+      puts 'Полная рука'
+    else
+      deal_card(@player)
+    end
+  end
+
+  def game_ends
+    p_score = @player.hand.calculate
+    d_score = @dealer.hand.calculate
+    @dealer.hand.__str__
+    @player.hand.__str__
+    if @player.lose? and @dealer.lose?
+      puts 'Ничья, оба проиграли'
+    elsif @player.lose?
+      puts 'Вы проиграли!!!'
+    elsif @dealer.lose?
+      puts 'Вы выиграли!!!'
+    else
+      choice_winner(p_score, d_score)
+    end
+  end
+
+  def choice_winner(p_score, d_score)
+    puts "Очки дилера #{d_score}"
+    puts "Ваши очки #{p_score}"
+    if p_score == d_score
+      puts 'Ничья'
+    elsif p_score > d_score
+      puts 'Вы победили'
+    else
+      puts 'Вы проиграли'
+    end
   end
 
   def open_cards
     @dealer.hand.cards.each {|card| card.show_card}
-  end
-
-  def end_game?
-    if @player.hand.cards.size = 3 and @dealer.hand.cards.size = 3
-      end_game
-    end
-  end
-
-  def end_game
-    puts 'end'
   end
 
   def play_again
@@ -78,3 +114,5 @@ class Game
   end
 
 end
+
+Game.new(Deck.new).start_game

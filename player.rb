@@ -15,4 +15,9 @@ class Player
   def lose?
     @hand.score > 21
   end
+
+  def enought_cash?(bet_value)
+    @cash > bet_value
+  end
+
 end
