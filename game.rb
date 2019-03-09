@@ -13,12 +13,18 @@ class Game
     @bank = 0
     @deck = deck
     @deck_counter = 0
+    @winner = nil
   end
 
   def start_game
     deal_cards
     make_bets
     dealer_move
+  end
+
+  def refund_bet
+    @winner.cash += @bank unless @winner.nil?
+    @bank = 0
   end
 
   def deal_card(player)
@@ -31,11 +37,10 @@ class Game
       deal_card(@player)
       deal_card(@dealer)
     end
-    puts @player.hand.cards
   end
 
   def make_bets
-    [@player, @dealer].each {|player| player.make_bet(BET)}
+    [@player, @dealer].each { |player| player.make_bet(BET) }
     @bank += 20
   end
 
@@ -47,17 +52,14 @@ class Game
 
   def rounds
     loop do
-      puts 'Текущая ситуация'
-      @player.hand.__str__
-      @interface.round_dialog
+      @interface.round_start(@player, @dealer)
       choise = gets.to_i
       case choise
       when 2 then player_add_card
       when 3 then break
       end
       deal_card(@dealer) if @dealer.take_card?
-      puts "Очки дилера #{@dealer.hand.score}"
-      break if !@player.hand.can_take_card? and !@dealer.hand.can_take_card?
+      break if !@player.can_take_card? && !@dealer.can_take_card?
     end
   end
 
@@ -67,7 +69,7 @@ class Game
   end
 
   def player_add_card
-    if !@player.hand.can_take_card?
+    if !@player.can_take_card?
       puts 'Полная рука'
     else
       deal_card(@player)
@@ -75,44 +77,51 @@ class Game
   end
 
   def game_ends
-    p_score = @player.hand.calculate
-    d_score = @dealer.hand.calculate
-    @dealer.hand.__str__
-    @player.hand.__str__
-    if @player.lose? and @dealer.lose?
-      puts 'Ничья, оба проиграли'
+    @interface.show_hand(@player)
+    @interface.show_hand(@dealer)
+    p_score = @player.hand.score
+    d_score = @dealer.hand.score
+    autolose? ? autolose : choice_winner(p_score, d_score)
+    refund_bet
+    @interface.show_cash(@player)
+    @player.enought_cash?(BET) ? @interface.again(self) : @interface.end_session
+  end
+
+  def autolose?
+    @player.lose? || @dealer.lose?
+  end
+
+  def autolose
+    puts 'Перенабор карт'
+    if @player.lose? && @dealer.lose?
+      puts 'Ничья'
+      @winner = nil
     elsif @player.lose?
-      puts 'Вы проиграли!!!'
-    elsif @dealer.lose?
-      puts 'Вы выиграли!!!'
+      puts 'Вы проиграли'
+      @winner = @dealer
     else
-      choice_winner(p_score, d_score)
+      puts 'Вы победили'
+      @winner = @player
     end
   end
 
   def choice_winner(p_score, d_score)
-    puts "Очки дилера #{d_score}"
-    puts "Ваши очки #{p_score}"
     if p_score == d_score
       puts 'Ничья'
+      @winner = nil
     elsif p_score > d_score
       puts 'Вы победили'
+      @winner = @player
     else
       puts 'Вы проиграли'
+      @winner = @dealer
     end
   end
 
-  def open_cards
-    @dealer.hand.cards.each {|card| card.show_card}
-  end
-
   def play_again
-    @deck.reset_deck
-    @deck.fill_deck
-    [@player, @dealer].each {|player| player.hand.reset}
+    @deck.shuffle!
+    @deck_counter = 0
+    [@player, @dealer].each { |player| player.hand.reset }
     start_game
   end
-
 end
-
-Game.new(Deck.new).start_game

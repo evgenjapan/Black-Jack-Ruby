@@ -7,15 +7,14 @@ class Hand
   def initialize
     @cards = []
     @score = 0
-    @opened = false
   end
 
   def calculate
     @score = 0
     @cards.each do |card|
-      @score += 10 if Card::PICTURES.include? card.value and card.value != 'A'
+      @score += 10 if Card::PICTURES.include?(card.value) && (card.value != 'A')
       @score += 1 if card.value == 'A'
-      @score += card.value.to_i if ('2'..'10').include? card.value
+      @score += card.value.to_i if ('2'..'10').cover? card.value
     end
     @score
   end
@@ -25,22 +24,11 @@ class Hand
     @score = 0
   end
 
-  def can_take_card?
-    @cards.size < CARD_LIMIT
-  end
-
-  def lose?
-    @score > BLACK_JACK
-  end
-
-  def open_hand
-    @opened = true
-  end
-
   def __str__
-    @cards.each {|card| card.show_card}
+    @cards.each(&:show_card)
     calculate
     puts "Current score #{@score}"
   end
 
+  alias show __str__
 end

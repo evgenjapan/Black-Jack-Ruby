@@ -5,11 +5,11 @@ class Deck
   def initialize
     @cards = []
     fill_deck
-    @cards.shuffle!
+    shuffle!
   end
 
-  def reset_deck
-    @cards = []
+  def shuffle!
+    @cards.shuffle!
   end
 
   def fill_deck

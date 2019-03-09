@@ -13,11 +13,14 @@ class Player
   end
 
   def lose?
-    @hand.score > 21
+    @hand.score > Hand:: BLACK_JACK
   end
 
   def enought_cash?(bet_value)
-    @cash > bet_value
+    @cash >= bet_value
   end
 
+  def can_take_card?
+    @hand.cards.size < Hand:: CARD_LIMIT
+  end
 end
