@@ -4,42 +4,35 @@ class Interface
     gets.chomp
   end
 
-  def round_start(player, dealer)
-    puts 'Текущая ситуация:'
-    show_hand(player)
-    show_masked(dealer)
-    round_dialog
+  def notify(message)
+    puts '*' * 15
+    puts message
+    puts '*' * 15
   end
 
   def round_dialog
     puts '1. Пропустить ход'
     puts '2. Взять карту'
     puts '3. Открыть карты'
+    gets.to_i
   end
 
-  def show_hand(player)
-    puts "#{player.name}:"
-    player.hand.show
+  def show_cash(name, cash)
+    puts "На счету игрока #{name}: #{cash}"
   end
 
-  def show_cash(player)
-    puts "На счету игрока #{player.name}: #{player.cash}"
+  def show_hand_masked(name, hand_size)
+    puts "Player #{name} has #{hand_size} cards"
   end
 
-  def show_masked(player)
-    puts "Player #{player.name} has #{player.hand.cards.size} cards"
-  end
-
-  def again(game)
+  def again?
     puts 'Сыграть еще раз?'
     puts 'Введите 1, если хотите сыграть еще'
-    case gets.to_i
-    when 1 then game.play_again
-    when 2 then end_session
-    end
+    gets.to_i === 1
   end
 
   def end_session
+    puts 'Игра окончена'
     puts 'Спасибо за игру'
   end
 end

@@ -14,7 +14,7 @@ class Hand
     @cards.each do |card|
       @score += 10 if Card::PICTURES.include?(card.value) && (card.value != 'A')
       @score += 1 if card.value == 'A'
-      @score += card.value.to_i if ('2'..'10').cover? card.value
+      @score += card.value.to_i if ('2'..'10').include? card.value
     end
     @score
   end
@@ -27,7 +27,7 @@ class Hand
   def __str__
     @cards.each(&:show_card)
     calculate
-    puts "Current score #{@score}"
+    puts "Текущее кол-во очков #{@score}"
   end
 
   alias show __str__

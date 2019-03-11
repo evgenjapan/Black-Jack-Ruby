@@ -5,6 +5,8 @@ require_relative 'dealer'
 class Game
   BET = 10
 
+  attr_accessor :interface, :player
+
   def initialize(deck)
     @interface = Interface.new
     username = @interface.init_user
@@ -14,12 +16,6 @@ class Game
     @deck = deck
     @deck_counter = 0
     @winner = nil
-  end
-
-  def start_game
-    deal_cards
-    make_bets
-    dealer_move
   end
 
   def refund_bet
@@ -52,9 +48,9 @@ class Game
 
   def rounds
     loop do
-      @interface.round_start(@player, @dealer)
-      choise = gets.to_i
-      case choise
+      @player.show_stat
+      @interface.show_hand_masked(@dealer.name, @dealer.hand.cards.size)
+      case @interface.round_dialog
       when 2 then player_add_card
       when 3 then break
       end
@@ -64,27 +60,33 @@ class Game
   end
 
   def init_game
+    reset_all
     make_bets
     deal_cards
   end
 
+  def reset_all
+    @deck.shuffle!
+    @deck_counter = 0
+    [@player, @dealer].each { |player| player.hand.reset }
+  end
+
   def player_add_card
     if !@player.can_take_card?
-      puts 'Полная рука'
+      @interface.notify('Полная рука')
     else
       deal_card(@player)
     end
   end
 
   def game_ends
-    @interface.show_hand(@player)
-    @interface.show_hand(@dealer)
+    @player.show_stat
+    @dealer.show_stat
     p_score = @player.hand.score
     d_score = @dealer.hand.score
     autolose? ? autolose : choice_winner(p_score, d_score)
     refund_bet
-    @interface.show_cash(@player)
-    @player.enought_cash?(BET) ? @interface.again(self) : @interface.end_session
+    @interface.show_cash(@player.name, @player.cash)
   end
 
   def autolose?
@@ -92,36 +94,33 @@ class Game
   end
 
   def autolose
-    puts 'Перенабор карт'
+    @interface.notify('Перенабор очков')
     if @player.lose? && @dealer.lose?
-      puts 'Ничья'
+      @interface.notify('Ничья')
       @winner = nil
     elsif @player.lose?
-      puts 'Вы проиграли'
+      @interface.notify('Вы проиграли')
       @winner = @dealer
     else
-      puts 'Вы победили'
+      @interface.notify('Вы выиграли')
       @winner = @player
     end
   end
 
   def choice_winner(p_score, d_score)
     if p_score == d_score
-      puts 'Ничья'
+      @interface.notify('Ничья')
       @winner = nil
     elsif p_score > d_score
-      puts 'Вы победили'
+      @interface.notify('Вы выиграли')
       @winner = @player
     else
-      puts 'Вы проиграли'
+      @interface.notify('Вы проиграли')
       @winner = @dealer
     end
   end
 
-  def play_again
-    @deck.shuffle!
-    @deck_counter = 0
-    [@player, @dealer].each { |player| player.hand.reset }
-    start_game
+  def can_play_again?
+    @player.enought_cash?(BET)
   end
 end
