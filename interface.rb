@@ -7,10 +7,10 @@ class Interface
   def notify(message)
     puts '*' * 15
     puts message
-    puts '*' * 15
   end
 
   def round_dialog
+    puts 'Выберите действие:'
     puts '1. Пропустить ход'
     puts '2. Взять карту'
     puts '3. Открыть карты'
@@ -22,7 +22,7 @@ class Interface
   end
 
   def show_hand_masked(name, hand_size)
-    puts "Player #{name} has #{hand_size} cards"
+    puts "Игрок #{name} имеет #{hand_size} карты"
   end
 
   def again?

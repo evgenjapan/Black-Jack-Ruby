@@ -9,6 +9,6 @@ class Card
   end
 
   def show_card
-    puts "#{@suit}#{@value}"
+    " #{@suit}#{@value} "
   end
 end

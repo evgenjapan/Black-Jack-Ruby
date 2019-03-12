@@ -21,12 +21,11 @@ class Player
   end
 
   def can_take_card?
-    @hand.cards.size < Hand:: CARD_LIMIT
+    @hand.size < Hand:: CARD_LIMIT
   end
 
   def __str__
-    puts "Игрок #{name}"
-    @hand.show
+    str = "Игрок #{name}: #{@hand.show}"
   end
   alias show_stat __str__
 end

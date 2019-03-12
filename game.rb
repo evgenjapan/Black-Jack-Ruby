@@ -14,8 +14,8 @@ class Game
     @dealer = Dealer.new
     @bank = 0
     @deck = deck
-    @deck_counter = 0
     @winner = nil
+    @interface.notify('Добро пожаловать в игру Black Jack')
   end
 
   def refund_bet
@@ -24,8 +24,7 @@ class Game
   end
 
   def deal_card(player)
-    player.hand.cards << @deck.cards[@deck_counter]
-    @deck_counter += 1
+    player.hand.add_card(@deck.cards.pop)
   end
 
   def deal_cards
@@ -48,8 +47,8 @@ class Game
 
   def rounds
     loop do
-      @player.show_stat
-      @interface.show_hand_masked(@dealer.name, @dealer.hand.cards.size)
+      @interface.notify(@player.show_stat)
+      @interface.show_hand_masked(@dealer.name, @dealer.hand.size)
       case @interface.round_dialog
       when 2 then player_add_card
       when 3 then break
@@ -66,8 +65,7 @@ class Game
   end
 
   def reset_all
-    @deck.shuffle!
-    @deck_counter = 0
+    @deck.reset_deck
     [@player, @dealer].each { |player| player.hand.reset }
   end
 
@@ -80,8 +78,8 @@ class Game
   end
 
   def game_ends
-    @player.show_stat
-    @dealer.show_stat
+    @interface.notify(@player.show_stat)
+    @interface.notify(@dealer.show_stat)
     p_score = @player.hand.score
     d_score = @dealer.hand.score
     autolose? ? autolose : choice_winner(p_score, d_score)

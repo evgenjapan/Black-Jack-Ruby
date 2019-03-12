@@ -22,4 +22,10 @@ class Deck
       end
     end
   end
+
+  def reset_deck
+    @cards = []
+    fill_deck
+    shuffle!
+  end
 end

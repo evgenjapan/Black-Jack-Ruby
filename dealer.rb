@@ -6,7 +6,6 @@ class Dealer < Player
   end
 
   def take_card?
-    hand.calculate
     can_take_card? && (hand.score < SCORE_LIMIT)
   end
 end
