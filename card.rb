@@ -1,5 +1,6 @@
 class Card
-  attr_accessor :value, :suit
+  attr_reader :value, :suit
+
   SUITS = %w[♠ ♥ ♣ ♦].freeze
   PICTURES = %w[J Q K A].freeze
 

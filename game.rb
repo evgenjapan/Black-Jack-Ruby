@@ -5,7 +5,7 @@ require_relative 'dealer'
 class Game
   BET = 10
 
-  attr_accessor :interface, :player
+  attr_accessor :interface
 
   def initialize(deck)
     @interface = Interface.new

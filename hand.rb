@@ -1,5 +1,5 @@
 class Hand
-  attr_accessor :score, :opened
+  attr_reader :score
 
   CARD_LIMIT = 3
   BLACK_JACK = 21
@@ -27,7 +27,7 @@ class Hand
 
   def __str__
     str = ''
-    @cards.each {|card| str += card.show_card}
+    @cards.each { |card| str += card.show_card }
     str += " Текущее кол-во очков - #{@score}"
   end
 
