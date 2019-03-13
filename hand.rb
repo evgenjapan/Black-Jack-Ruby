@@ -9,10 +9,20 @@ class Hand
     @score = 0
   end
 
+  def choice_ace_score
+    if @score + 11 < BLACK_JACK
+        (BLACK_JACK - @score + 1).abs > (BLACK_JACK - @score + 11).abs ? @score += 1 : @score += 11
+    else
+        @score += 1
+    end
+  end
+
   def add_card(card)
     @cards << card
     @score += 10 if Card::PICTURES.include?(card.value) && (card.value != 'A')
-    @score += 1 if card.value == 'A'
+    if card.value == 'A'
+        choice_ace_score
+    end
     @score += card.value.to_i if ('2'..'10').include? card.value
   end
 
