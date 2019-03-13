@@ -11,7 +11,7 @@ class Hand
 
   def choice_ace_score
     if @score + 11 <= BLACK_JACK
-        (BLACK_JACK - @score + 1).abs > (BLACK_JACK - @score + 11).abs ? @score += 1 : @score += 11
+        @score += 11
     else
         @score += 1
     end
